@@ -31,8 +31,12 @@ run = do
   input <- readFile "solutions/Year2015/inputs/day1.txt"
   print $ "Testing example input: " ++ show test1
 
+  putChar '\n'
+
   res1 <- timeIt "Part 1" $ solve1 input
   print $ "Part 1: " ++ show res1
+
+  putChar '\n'
 
   res2 <- timeIt "Part 2" $ solve2 input
   print $ "Part 2: " ++ show res2
