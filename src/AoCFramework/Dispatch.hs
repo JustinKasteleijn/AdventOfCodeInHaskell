@@ -5,14 +5,16 @@ where
 
 import AoCFramework.AoCTypes
 import qualified Data.Map as Map
-import Year2015.Day1 as Y2025D1
+import Year2015.Day1 as Y2015D1
+import Year2015.Day2 as Y2015D2
 
 type SolutionMap = Map.Map (Year, Day) (IO ())
 
 solutions :: SolutionMap
 solutions =
   Map.fromList
-    [ ((Year 2015, Day 1), Y2025D1.run)
+    [ ((Year 2015, Day 1), Y2015D1.run),
+      ((Year 2015, Day 2), Y2015D2.run)
     ]
 
 dispatch :: Year -> Day -> IO ()

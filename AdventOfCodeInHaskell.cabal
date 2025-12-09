@@ -64,7 +64,8 @@ executable AdventOfCodeInHaskell
     other-modules: AoCFramework.AoCTypes,
       Parser,
       AoCFramework.Dispatch,
-      Year2015.Day1
+      Year2015.Day1,
+      Year2015.Day2
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

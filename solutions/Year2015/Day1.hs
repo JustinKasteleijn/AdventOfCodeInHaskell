@@ -3,7 +3,7 @@ module Year2015.Day1
   )
 where
 
-import Data.List (elemIndex, foldl', scanl)
+import Data.List (elemIndex, foldl')
 import Data.Maybe (fromJust)
 
 calc :: Char -> (Int -> Int)
