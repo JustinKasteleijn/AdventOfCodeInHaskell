@@ -1,4 +1,4 @@
-module Year2015.Day1
+module _
   ( run,
   )
 where

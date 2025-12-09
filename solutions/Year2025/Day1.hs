@@ -8,7 +8,7 @@ where
 
 import Benchmark
 import Control.DeepSeq (NFData (..))
-import Data.List (scanl')
+import Data.List (foldl', scanl')
 import GHC.Generics (Generic (..))
 import Parser
   ( Parser (..),
@@ -50,37 +50,55 @@ rotate :: Rotation -> Dial -> Dial
 rotate (L n) dial = mkDial $ unwrap dial - n
 rotate (R n) dial = mkDial $ unwrap dial + n
 
--- ----------- Test Cases ------------
+delta :: Rotation -> Int
+delta (R n) = n
+delta (L n) = -n
+
 test1 :: Bool
 test1 =
   let parsed = unwrapParser parseRotations testInput
    in solve1 parsed == 3
 
--- ----------- Solve ------------
 solve1 :: [Rotation] -> Int
 solve1 =
   length
     . filter ((== 0) . unwrap)
     . scanl' (flip rotate) initDial
 
-solve2 :: String -> Int
-solve2 = undefined
+data FoldState = FS
+  { acc :: !Int,
+    _dial :: !Dial
+  }
+
+solve2 :: [Rotation] -> Int
+solve2 =
+  acc
+    . foldl' countFlowing (FS 0 initDial)
+  where
+    countFlowing :: FoldState -> Rotation -> FoldState
+    countFlowing (FS acc' dial') r =
+      let d = delta r
+          step = if d > 0 then 1 :: Int else -1
+          positions = take (abs d) $ tail $ iterate (\x -> mkDial $ unwrap x + fromIntegral step) dial'
+          hitsDuring = length $ filter ((== 0) . unwrap) positions
+          dial'' = mkDial $ unwrap dial' + fromIntegral d
+       in FS (acc' + hitsDuring) dial''
 
 run :: IO ()
 run = do
   input <- readFile "solutions/Year2025/inputs/day1.txt"
-  print $ "Testing example input: " ++ show test1
+  putStrLn $ "Testing example input: " ++ show test1
   parsed <- timeIt "Parsing: " $ unwrapParser parseRotations input
 
   putChar '\n'
 
   res1 <- timeIt "Part 1" $ solve1 parsed
-  print $ "Part 1: " ++ show res1
+  putStrLn $ "Part 1: " ++ show res1
 
   putChar '\n'
 
--- res2 <- timeIt "Part 2" $ solve2 input
--- print $ "Part 2: " ++ show res2
+  res2 <- timeIt "Part 2" $ solve2 parsed
+  putStrLn $ "Part 2: " ++ show res2
 
 testInput :: String
 testInput =

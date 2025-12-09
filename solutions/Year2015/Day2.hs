@@ -71,8 +71,8 @@ solve2 = solve ribbon
 run :: IO ()
 run = do
   input <- readFile "solutions/Year2015/inputs/day2.txt"
-  print $ "Testing example input Part 1: " ++ show test1
-  print $ "Testing example input Part 1: " ++ show test2
+  putStrLn $ "Testing example input Part 1: " ++ show test1
+  putStrLn $ "Testing example input Part 1: " ++ show test2
 
   putChar '\n'
 
@@ -81,9 +81,9 @@ run = do
   putChar '\n'
 
   res1 <- timeIt "Part 1" $ solve1 parsed
-  print $ "Part 1: " ++ show res1
+  putStrLn $ "Part 1: " ++ show res1
 
   putChar '\n'
 
   res2 <- timeIt "Part 2" $ solve2 parsed
-  print $ "Part 2: " ++ show res2
+  putStrLn $ "Part 2: " ++ show res2
