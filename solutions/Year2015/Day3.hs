@@ -16,7 +16,7 @@ origin = V2 0 0
 
 data FoldState = FS
   { visited :: !(S.Set (V2 Int)),
-    currentPos :: !(V2 Int)
+    _currentPos :: !(V2 Int)
   }
 
 deliver :: FoldState -> Char -> FoldState
