@@ -1,3 +1,6 @@
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+
 module Year2015.Day2
   ( run,
   )
@@ -6,6 +9,7 @@ where
 import Benchmark
 import Control.DeepSeq (NFData (..))
 import Data.List (foldl', sort)
+import GHC.Generics (Generic (..))
 import Parser
 
 data RectangularCuboid = RC
@@ -13,10 +17,7 @@ data RectangularCuboid = RC
     width' :: {-# UNPACK #-} !Int,
     height' :: {-# UNPACK #-} !Int
   }
-  deriving (Show)
-
-instance NFData RectangularCuboid where
-  rnf (RC l w h) = l `seq` w `seq` h `seq` ()
+  deriving (Show, Generic, NFData)
 
 mkRectangularCuboid :: Int -> Int -> Int -> RectangularCuboid
 mkRectangularCuboid = RC
