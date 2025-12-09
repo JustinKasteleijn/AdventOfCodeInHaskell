@@ -3,7 +3,8 @@ module Year2015.Day1
   )
 where
 
-import Data.List (elemIndex, foldl')
+import Benchmark
+import Data.List (elemIndex, foldl', scanl')
 import Data.Maybe (fromJust)
 
 calc :: Char -> (Int -> Int)
@@ -23,11 +24,15 @@ solve2 :: String -> Int
 solve2 =
   fromJust
     . elemIndex (-1)
-    . scanl (flip calc) 0
+    . scanl' (flip calc) 0
 
 run :: IO ()
 run = do
   input <- readFile "solutions/Year2015/inputs/day1.txt"
   print $ "Testing example input: " ++ show test1
-  print $ "Part 1: " ++ show (solve1 input)
-  print $ "Part 2: " ++ show (solve2 input)
+
+  res1 <- timeIt "Part 1" $ solve1 input
+  print $ "Part 1: " ++ show res1
+
+  res2 <- timeIt "Part 2" $ solve2 input
+  print $ "Part 2: " ++ show res2
