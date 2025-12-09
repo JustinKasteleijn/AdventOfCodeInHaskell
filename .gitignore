@@ -1,0 +1,31 @@
+# GHC / Cabal build artifacts
+/dist-newstyle/
+*.hi
+*.o
+*.dyn_o
+*.dyn_hi
+*.prof
+*.haddock
+dist/
+cabal.project.local
+
+# Stack (if ever used)
+.stack-work/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE files
+.zed/
+*.swap
+
+# Build logs
+cabal-build.log
+cabal-install.log
+
+# Compiled binaries
+*.exe
+
+# Ignore all .txt files (e.g., Advent of Code inputs)
+*.txt
