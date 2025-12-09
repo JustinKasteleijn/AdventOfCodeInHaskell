@@ -3,8 +3,31 @@ module Year2015.Day1
   )
 where
 
+import Data.List (elemIndex, foldl', scanl)
+import Data.Maybe (fromJust)
+
+calc :: Char -> (Int -> Int)
+calc '(' = (+ 1)
+calc ')' = (+ (-1))
+calc _ = (+ 0)
+
+test1 :: Bool
+test1 =
+  solve1 "(())" == 0
+    && solve1 "()()" == 0
+
 solve1 :: String -> Int
-solve1 = const 4
+solve1 = foldl' (flip calc) 0
+
+solve2 :: String -> Int
+solve2 =
+  fromJust
+    . elemIndex (-1)
+    . scanl (flip calc) 0
 
 run :: IO ()
-run = print $ solve1 "input"
+run = do
+  input <- readFile "solutions/Year2015/inputs/day1.txt"
+  print $ "Testing example input: " ++ show test1
+  print $ "Part 1: " ++ show (solve1 input)
+  print $ "Part 2: " ++ show (solve2 input)

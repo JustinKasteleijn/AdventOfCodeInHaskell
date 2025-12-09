@@ -1,4 +1,4 @@
-module AoCTypes where
+module AoCFramework.AoCTypes where
 
 import Text.Read (readMaybe)
 

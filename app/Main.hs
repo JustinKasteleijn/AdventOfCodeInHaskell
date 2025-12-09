@@ -1,7 +1,7 @@
 module Main where
 
-import AoCTypes
-import Dispatch (dispatch)
+import AoCFramework.AoCTypes
+import AoCFramework.Dispatch (dispatch)
 import System.Environment
 
 main :: IO ()

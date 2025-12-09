@@ -1,9 +1,9 @@
-module Dispatch
+module AoCFramework.Dispatch
   ( dispatch,
   )
 where
 
-import AoCTypes
+import AoCFramework.AoCTypes
 import qualified Data.Map as Map
 import Year2015.Day1 as Y2025D1
 
@@ -19,4 +19,6 @@ dispatch :: Year -> Day -> IO ()
 dispatch year day =
   case Map.lookup (year, day) solutions of
     Nothing -> putStrLn $ "No solution for year " ++ show year ++ " day " ++ show day
-    Just action -> action
+    Just action -> do
+      putStrLn $ "Running: " ++ show year ++ " " ++ show day
+      action
