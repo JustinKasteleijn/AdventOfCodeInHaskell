@@ -67,7 +67,8 @@ executable AdventOfCodeInHaskell
       Benchmark,
       Year2015.Day1,
       Year2015.Day2,
-      Year2015.Day3
+      Year2015.Day3,
+      Year2025.Day1
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

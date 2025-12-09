@@ -8,6 +8,7 @@ import qualified Data.Map as Map
 import Year2015.Day1 as Y2015D1
 import Year2015.Day2 as Y2015D2
 import Year2015.Day3 as Y2015D3
+import Year2025.Day1 as Y2025D1
 
 type SolutionMap = Map.Map (Year, Day) (IO ())
 
@@ -16,7 +17,8 @@ solutions =
   Map.fromList
     [ ((Year 2015, Day 1), Y2015D1.run),
       ((Year 2015, Day 2), Y2015D2.run),
-      ((Year 2015, Day 3), Y2015D3.run)
+      ((Year 2015, Day 3), Y2015D3.run),
+      ((Year 2025, Day 1), Y2025D1.run)
     ]
 
 dispatch :: Year -> Day -> IO ()
