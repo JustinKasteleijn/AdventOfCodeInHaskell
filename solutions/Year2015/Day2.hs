@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveAnyClass #-}
-
 module Year2015.Day2
   ( run,
   )
@@ -11,9 +9,9 @@ import Data.List (foldl', sort)
 import Parser
 
 data RectangularCuboid = RC
-  { length' :: !Int,
-    width' :: !Int,
-    height' :: !Int
+  { length' :: {-# UNPACK #-} !Int,
+    width' :: {-# UNPACK #-} !Int,
+    height' :: {-# UNPACK #-} !Int
   }
   deriving (Show)
 
@@ -58,11 +56,14 @@ test2 =
   ribbon (RC 2 3 4) == 34
     && ribbon (RC 1 1 10) == 14
 
+solve :: (RectangularCuboid -> Int) -> [RectangularCuboid] -> Int
+solve f = foldl' (\acc cube -> acc + f cube) 0
+
 solve1 :: [RectangularCuboid] -> Int
-solve1 = foldl' (\acc cube -> acc + wrappingPaper cube) 0
+solve1 = solve wrappingPaper
 
 solve2 :: [RectangularCuboid] -> Int
-solve2 = foldl' (\acc cube -> acc + ribbon cube) 0
+solve2 = solve ribbon
 
 run :: IO ()
 run = do
