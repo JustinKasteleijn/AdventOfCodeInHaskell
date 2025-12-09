@@ -32,9 +32,11 @@ parseRectangularCuboids = lines1 parseRectangularCuboid
 
 area :: RectangularCuboid -> Int
 area (RC l w h) = 2 * (l * w + l * h + w * h)
+{-# INLINE area #-}
 
 volume :: RectangularCuboid -> Int
 volume (RC l w h) = l * w * h
+{-# INLINE volume #-}
 
 wrappingPaper :: RectangularCuboid -> Int
 wrappingPaper rc@(RC l w h) =
