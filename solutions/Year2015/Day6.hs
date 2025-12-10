@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module Year2015.Day6
   ( run,
@@ -12,7 +13,6 @@ import Control.Monad (forM_)
 import Control.Monad.ST
 import Data.Array.ST
 import Data.Functor (($>))
-import Data.STRef
 import GHC.Generics (Generic (..))
 import Linear.V2 (V2 (..))
 import Parser (Parser (..), choice, int, lines1, splitOn, string, unwrapParser)
@@ -23,7 +23,7 @@ data Modify
   | Off
   deriving (Show, Generic, NFData)
 
-type Grid s = STUArray s (V2 Int) Bool
+type Grid s a = STUArray s (V2 Int) a
 
 data Instruction
   = Instruction
@@ -54,27 +54,36 @@ parseInstruction = do
 parseInstructions :: Parser [Instruction]
 parseInstructions = lines1 parseInstruction
 
-executeInstruction :: Grid s -> Instruction -> ST s ()
-executeInstruction arr (Instruction modifier' (V2 x1 y1) (V2 x2 y2)) =
+executeInstruction :: (MArray (STUArray s) a (ST s)) => (Modify -> a -> a) -> Grid s a -> Instruction -> ST s ()
+executeInstruction act arr (Instruction modifier' (V2 x1 y1) (V2 x2 y2)) =
   forM_ [x1 .. x2] $ \x ->
     forM_ [y1 .. y2] $ \y -> do
       old <- readArray arr (V2 x y)
       writeArray arr (V2 x y) (act modifier' old)
-  where
-    act :: Modify -> Bool -> Bool
-    act On _ = True
-    act Off _ = False
-    act Toggle b = not b
+
+actBool :: Modify -> Bool -> Bool
+actBool On _ = True
+actBool Off _ = False
+actBool Toggle b = not b
 
 solve1 :: [Instruction] -> ST s Int
 solve1 instructions = do
-  arr <- newArray (V2 0 0, V2 999 999) False :: ST s (STUArray s (V2 Int) Bool)
-  mapM_ (executeInstruction arr) instructions
+  arr <- newArray (V2 0 0, V2 999 999) False :: ST s (Grid s Bool)
+  mapM_ (executeInstruction actBool arr) instructions
   elems <- getElems arr
   return $ length $ filter id elems
 
-solve2 :: String -> Int
-solve2 = undefined
+solve2 :: [Instruction] -> ST s Int
+solve2 instructions = do
+  arr <- newArray (V2 0 0, V2 999 999) 0 :: ST s (Grid s Int)
+  mapM_ (executeInstruction actInt arr) instructions
+  elems <- getElems arr
+  return $ sum elems
+
+actInt :: Modify -> Int -> Int
+actInt On n = n + 1
+actInt Off n = max 0 (n - 1)
+actInt Toggle n = n + 2
 
 run :: IO ()
 run = do
@@ -89,5 +98,5 @@ run = do
 
   putChar '\n'
 
--- res2 <- timeIt "Part 2" $ solve2 input
--- print $ "Part 2: " ++ show res2
+  res2 <- timeIt "Part 2" $ force $ runST $ solve2 parsed
+  print $ "Part 2: " ++ show res2
