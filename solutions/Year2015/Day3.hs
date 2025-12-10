@@ -6,13 +6,7 @@ where
 import Benchmark
 import Data.List (foldl')
 import qualified Data.Set as S
-
-data V2 a = V2 !a !a
-  deriving (Show, Eq, Ord)
-
-origin :: V2 Int
-origin = V2 0 0
-{-# INLINE origin #-}
+import Linear.V2 (V2 (..), origin)
 
 data FoldState = FS
   { visited :: !(S.Set (V2 Int)),

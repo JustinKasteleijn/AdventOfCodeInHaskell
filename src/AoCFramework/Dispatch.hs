@@ -10,6 +10,7 @@ import Year2015.Day2 as Y2015D2
 import Year2015.Day3 as Y2015D3
 import Year2015.Day4 as Y2015D4
 import Year2015.Day5 as Y2015D5
+import Year2015.Day6 as Y2015D6
 import Year2025.Day1 as Y2025D1
 
 type SolutionMap = Map.Map (Year, Day) (IO ())
@@ -22,6 +23,7 @@ solutions =
       ((Year 2015, Day 3), Y2015D3.run),
       ((Year 2015, Day 4), Y2015D4.run),
       ((Year 2015, Day 5), Y2015D5.run),
+      ((Year 2015, Day 6), Y2015D6.run),
       ((Year 2025, Day 1), Y2025D1.run)
     ]
 

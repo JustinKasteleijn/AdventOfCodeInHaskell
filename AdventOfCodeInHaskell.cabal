@@ -65,11 +65,13 @@ executable AdventOfCodeInHaskell
       Parser,
       AoCFramework.Dispatch,
       Benchmark,
+      Linear.V2,
       Year2015.Day1,
       Year2015.Day2,
       Year2015.Day3,
       Year2015.Day4,
       Year2015.Day5,
+      Year2015.Day6,
       Year2025.Day1
 
     -- LANGUAGE extensions used by modules in this package.
@@ -81,7 +83,8 @@ executable AdventOfCodeInHaskell
       containers,
       deepseq,
       time,
-      MissingH
+      MissingH,
+      array
 
     -- Directories containing source files.
     hs-source-dirs:   app, src, solutions
