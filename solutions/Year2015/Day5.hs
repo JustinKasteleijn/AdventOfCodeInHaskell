@@ -33,8 +33,34 @@ notContain str = not $ any (`isInfixOf` str) forbidden
     forbidden :: [String]
     forbidden = ["ab", "cd", "pq", "xy"]
 
--- xyxy
--- [xyxy] [xyx]
+pairsOfLetter :: Rule
+pairsOfLetter s =
+  any hasRepeat (tails s)
+  where
+    hasRepeat :: String -> Bool
+    hasRepeat (a : b : rest) =
+      any ([a, b] `isInfixOf`) (tails rest)
+    hasRepeat _ = False
+
+repeatingLetterOneInBetween :: Rule
+repeatingLetterOneInBetween str =
+  any (uncurry (==)) (zip str (drop 2 str))
+
+testRepeatingLetterOneInBetween :: Bool
+testRepeatingLetterOneInBetween =
+  repeatingLetterOneInBetween "xyx"
+    && repeatingLetterOneInBetween "abcdefeghi"
+    && repeatingLetterOneInBetween "aaa"
+
+testPairsOfLetter :: Bool
+testPairsOfLetter =
+  pairsOfLetter "xyxy"
+    && pairsOfLetter "aabcdefaa"
+    && not (pairsOfLetter "aaa")
+
+testExamplesP2 :: Bool
+testExamplesP2 =
+  solve2 ["qjhvhtzxzqqjkmpb", "xxyxx", "uurcxstgmygtbstg", "ieodomkazucvgmuy"] == 2
 
 testVowels :: Bool
 testVowels =
@@ -54,8 +80,8 @@ testNotContain =
     notContain "ab"
       && notContain "de"
 
-testExamples :: Bool
-testExamples =
+testExamplesP1 :: Bool
+testExamplesP1 =
   solve1 ["ugknbfddgicrmopn", "aaa", "jchzalrnumimnmhp", "haegwjzuvuyypxyu", "dvszwmarrgswjxmb"] == 2
 
 -- ----------- Solve -----------
@@ -64,16 +90,21 @@ solve1 =
   length
     . filter (\s -> threeVowels s && twiceInARow s && notContain s)
 
-solve2 :: String -> Int
-solve2 = undefined
+solve2 :: [String] -> Int
+solve2 =
+  length
+    . filter (\s -> repeatingLetterOneInBetween s && pairsOfLetter s)
 
 run :: IO ()
 run = do
   input <- readFile "solutions/Year2015/inputs/day5.txt"
+
+  putStrLn "Part 1:"
+
   print $ "Testing vowel rule: " ++ show testVowels
   print $ "Testing two in a row rule: " ++ show testTwiceInARow
   print $ "Testing not contain rule: " ++ show testNotContain
-  print $ "Testing example input?:" ++ show testExamples
+  print $ "Testing example input?:" ++ show testExamplesP1
 
   putChar '\n'
 
@@ -86,7 +117,11 @@ run = do
 
   putChar '\n'
 
-  print $ pairOfLetters "xyxy"
+  putStrLn "Part 2:"
 
--- res2 <- timeIt "Part 2" $ solve2 input
--- print $ "Part 2: " ++ show res2
+  print $ "Testing pairs of letter rule: " ++ show testPairsOfLetter
+  print $ "Testing letter with one other letter in between: " ++ show testRepeatingLetterOneInBetween
+  print $ "Testing examples part 2: " ++ show testExamplesP2
+
+  res2 <- timeIt "Part 2" $ solve2 parsed
+  print $ "Part 2: " ++ show res2
