@@ -8,14 +8,7 @@ module Parser
     string,
     int,
     nat,
-    i8,
-    u8,
-    i16,
-    u16,
-    i32,
-    u32,
-    i64,
-    u64,
+    try,
     digits0,
     digits1,
     spaces0,
@@ -24,6 +17,8 @@ module Parser
     alpha1,
     alphaNum0,
     alphaNum1,
+    newline0,
+    newline1,
     sepBy0,
     sepBy1,
     lines1,
@@ -37,7 +32,6 @@ where
 import Control.Applicative (Alternative (..), asum)
 import Control.Monad (void)
 import Data.Char (isAlpha, isAlphaNum, isDigit)
-import Types.IntegerTypes (I16, I32, I64, I8, U16, U32, U64, U8)
 
 type Error = String
 
@@ -207,36 +201,6 @@ splitOn' str px py = do
   _ <- string str
   y <- py
   return (x, y)
-
-digitsAsList :: Parser [Int]
-digitsAsList =
-  map (\c -> fromEnum c - fromEnum '0')
-    <$> digits1
-
--- Bounded Parsers
-i8 :: Parser I8
-i8 = parseBounded
-
-u8 :: Parser U8
-u8 = parseBounded
-
-i16 :: Parser I16
-i16 = parseBounded
-
-u16 :: Parser U16
-u16 = parseBounded
-
-i32 :: Parser I32
-i32 = parseBounded
-
-u32 :: Parser U32
-u32 = parseBounded
-
-i64 :: Parser I64
-i64 = parseBounded
-
-u64 :: Parser U64
-u64 = parseBounded
 
 -- Utilities
 

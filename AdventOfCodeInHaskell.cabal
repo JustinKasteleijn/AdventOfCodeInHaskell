@@ -67,7 +67,6 @@ executable AdventOfCodeInHaskell
       Benchmark,
       Linear.V2,
       Strict.List,
-      Types.IntegerTypes,
       Year2015.Day1,
       Year2015.Day2,
       Year2015.Day3,
