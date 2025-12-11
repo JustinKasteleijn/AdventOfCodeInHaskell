@@ -11,9 +11,11 @@ import Benchmark
 import Control.DeepSeq (NFData (..), force)
 import Control.Monad (forM_)
 import Control.Monad.ST
+import Data.Array.Base (MArray (unsafeRead, unsafeWrite))
 import Data.Array.ST
 import Data.Functor (($>))
 import Data.List (foldl')
+import GHC.Arr (unsafeArray')
 import GHC.Generics (Generic (..))
 import Linear.V2 (V2 (..))
 import Parser (Parser (..), choice, int, lines1, splitOn, string, unwrapParser)
@@ -25,7 +27,10 @@ data Modify
   | Off
   deriving (Show, Generic, NFData)
 
-type Grid s a = STUArray s (V2 Int) a
+type Grid s a = STUArray s Int a
+
+flattenV2 :: Int -> V2 Int -> Int
+flattenV2 width (V2 x y) = y * width + x
 
 data Instruction
   = Instruction
@@ -56,13 +61,19 @@ parseInstruction = do
 parseInstructions :: Parser [Instruction]
 parseInstructions = lines1 parseInstruction
 
-executeInstruction :: (MArray (STUArray s) a (ST s)) => (Modify -> a -> a) -> Grid s a -> Instruction -> ST s ()
+executeInstruction ::
+  (MArray (STUArray s) a (ST s)) =>
+  (Modify -> a -> a) ->
+  Grid s a ->
+  Instruction ->
+  ST s ()
 executeInstruction act arr (Instruction modifier' (V2 x1 y1) (V2 x2 y2)) =
   let f = act modifier'
    in forM_ [x1 .. x2] $ \x ->
         forM_ [y1 .. y2] $ \y -> do
-          old <- readArray arr (V2 x y)
-          writeArray arr (V2 x y) (f old)
+          let idx = flattenV2 1000 (V2 x y)
+          old <- unsafeRead arr idx
+          unsafeWrite arr idx (f old)
 
 actBool :: Modify -> Bool -> Bool
 actBool On _ = True
@@ -78,7 +89,9 @@ actInt Toggle n = n + 2
 
 solve1 :: [Instruction] -> ST s Int
 solve1 instructions = do
-  arr <- newArray (V2 0 0, V2 999 999) False :: ST s (Grid s Bool)
+  let width = 1000
+  let height = 1000
+  arr <- newArray (0, (width * height) - 1) False :: ST s (Grid s Bool)
   mapM_ (executeInstruction actBool arr) instructions
   elems <- getElems arr
   return $ foldl' countTrues 0 elems
@@ -90,7 +103,9 @@ solve1 instructions = do
 
 solve2 :: [Instruction] -> ST s Int
 solve2 instructions = do
-  arr <- newArray (V2 0 0, V2 999 999) 0 :: ST s (Grid s Int)
+  let width = 1000
+  let height = 1000
+  arr <- newArray (0, (width * height) - 1) 0 :: ST s (Grid s Int)
   mapM_ (executeInstruction actInt arr) instructions
   elems <- getElems arr
   return $ product' elems
