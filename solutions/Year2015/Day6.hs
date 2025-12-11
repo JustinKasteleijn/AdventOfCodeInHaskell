@@ -13,9 +13,11 @@ import Control.Monad (forM_)
 import Control.Monad.ST
 import Data.Array.ST
 import Data.Functor (($>))
+import Data.List (foldl')
 import GHC.Generics (Generic (..))
 import Linear.V2 (V2 (..))
 import Parser (Parser (..), choice, int, lines1, splitOn, string, unwrapParser)
+import Strict.List (product')
 
 data Modify
   = Toggle
@@ -27,9 +29,9 @@ type Grid s a = STUArray s (V2 Int) a
 
 data Instruction
   = Instruction
-  { modifier :: !Modify,
-    from :: !(V2 Int),
-    to :: !(V2 Int)
+  { modifier :: {-# UNPACK #-} !Modify,
+    from :: {-# UNPACK #-} !(V2 Int),
+    to :: {-# UNPACK #-} !(V2 Int)
   }
   deriving (Show, Generic, NFData)
 
@@ -56,34 +58,42 @@ parseInstructions = lines1 parseInstruction
 
 executeInstruction :: (MArray (STUArray s) a (ST s)) => (Modify -> a -> a) -> Grid s a -> Instruction -> ST s ()
 executeInstruction act arr (Instruction modifier' (V2 x1 y1) (V2 x2 y2)) =
-  forM_ [x1 .. x2] $ \x ->
-    forM_ [y1 .. y2] $ \y -> do
-      old <- readArray arr (V2 x y)
-      writeArray arr (V2 x y) (act modifier' old)
+  let f = act modifier'
+   in forM_ [x1 .. x2] $ \x ->
+        forM_ [y1 .. y2] $ \y -> do
+          old <- readArray arr (V2 x y)
+          writeArray arr (V2 x y) (f old)
 
 actBool :: Modify -> Bool -> Bool
 actBool On _ = True
 actBool Off _ = False
 actBool Toggle b = not b
+{-# INLINE actBool #-}
+
+actInt :: Modify -> Int -> Int
+actInt On n = n + 1
+actInt Off n = max 0 (n - 1)
+actInt Toggle n = n + 2
+{-# INLINE actInt #-}
 
 solve1 :: [Instruction] -> ST s Int
 solve1 instructions = do
   arr <- newArray (V2 0 0, V2 999 999) False :: ST s (Grid s Bool)
   mapM_ (executeInstruction actBool arr) instructions
   elems <- getElems arr
-  return $ length $ filter id elems
+  return $ foldl' countTrues 0 elems
+  where
+    countTrues :: Int -> Bool -> Int
+    countTrues acc True = acc + 1
+    countTrues acc False = acc
+    {-# INLINE countTrues #-}
 
 solve2 :: [Instruction] -> ST s Int
 solve2 instructions = do
   arr <- newArray (V2 0 0, V2 999 999) 0 :: ST s (Grid s Int)
   mapM_ (executeInstruction actInt arr) instructions
   elems <- getElems arr
-  return $ sum elems
-
-actInt :: Modify -> Int -> Int
-actInt On n = n + 1
-actInt Off n = max 0 (n - 1)
-actInt Toggle n = n + 2
+  return $ product' elems
 
 run :: IO ()
 run = do

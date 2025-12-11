@@ -66,6 +66,7 @@ executable AdventOfCodeInHaskell
       AoCFramework.Dispatch,
       Benchmark,
       Linear.V2,
+      Strict.List,
       Year2015.Day1,
       Year2015.Day2,
       Year2015.Day3,
