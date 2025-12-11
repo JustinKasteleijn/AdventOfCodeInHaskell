@@ -15,7 +15,6 @@ import Data.Array.Base (MArray (unsafeRead, unsafeWrite))
 import Data.Array.ST
 import Data.Functor (($>))
 import Data.List (foldl')
-import GHC.Arr (unsafeArray')
 import GHC.Generics (Generic (..))
 import Linear.V2 (V2 (..))
 import Parser (Parser (..), choice, int, lines1, splitOn, string, unwrapParser)
@@ -29,6 +28,11 @@ data Modify
 
 type Grid s a = STUArray s Int a
 
+-- (0,0) -> 0   (1,0) -> 1   (2,0) -> 2
+-- (0,1) -> 3   (1,1) -> 4   (2,1) -> 5
+-- (0,2) -> 6   (1,2) -> 7   (2,2) -> 8
+-- Example in 3x3 => flatten 3 (1, 1) -> 1 * 3 + 1 = 4 (middle)
+-- Used to Index in a 1-d flatten
 flattenV2 :: Int -> V2 Int -> Int
 flattenV2 width (V2 x y) = y * width + x
 
@@ -71,7 +75,7 @@ executeInstruction act arr (Instruction modifier' (V2 x1 y1) (V2 x2 y2)) =
   let f = act modifier'
    in forM_ [x1 .. x2] $ \x ->
         forM_ [y1 .. y2] $ \y -> do
-          let idx = flattenV2 1000 (V2 x y)
+          let idx = flattenV2 1000 (V2 x y) -- Flatten index for faster lookup
           old <- unsafeRead arr idx
           unsafeWrite arr idx (f old)
 
