@@ -1,4 +1,4 @@
-# Advent of Code in Haskell 
+# Advent of Code in Haskell ⭐ (14/524) ⭐  
 
 This project will contain all of my solutions for Advent of Code (AoC).
 
