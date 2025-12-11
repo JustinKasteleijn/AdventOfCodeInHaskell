@@ -20,6 +20,6 @@ instance (Ix a) => Ix (V2 a) where
   inRange (V2 x1 y1, V2 x2 y2) (V2 x y) =
     inRange (x1, x2) x && inRange (y1, y2) y
 
-origin :: V2 Int
+origin :: (Num a) => V2 a
 origin = V2 0 0
 {-# INLINE origin #-}

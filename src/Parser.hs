@@ -1,11 +1,43 @@
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE LambdaCase #-}
 
-module Parser where
+module Parser
+  ( Parser (..),
+    item,
+    char,
+    string,
+    int,
+    nat,
+    i8,
+    u8,
+    i16,
+    u16,
+    i32,
+    u32,
+    i64,
+    u64,
+    digits0,
+    digits1,
+    spaces0,
+    spaces1,
+    alpha0,
+    alpha1,
+    alphaNum0,
+    alphaNum1,
+    sepBy0,
+    sepBy1,
+    lines1,
+    splitOn,
+    splitOn',
+    choice,
+    unwrapParser,
+  )
+where
 
-import Control.Applicative (Alternative (..))
+import Control.Applicative (Alternative (..), asum)
 import Control.Monad (void)
 import Data.Char (isAlpha, isAlphaNum, isDigit)
+import Types.IntegerTypes (I16, I32, I64, I8, U16, U32, U64, U8)
 
 type Error = String
 
@@ -133,14 +165,22 @@ nat = read <$> digits1
 int :: Parser Int
 int = nat <|> char '-' *> (negate <$> nat)
 
+parseBounded :: (Bounded a, Integral a) => Parser a
+parseBounded = do
+  n <- int
+  let n' = fromIntegral n
+  if n' >= minBound && n' <= maxBound
+    then return n'
+    else fail $ "Value out of bounds: " ++ show n
+
 sepBy1 :: Parser a -> Parser b -> Parser [a]
 sepBy1 px psep =
   (:)
     <$> px
     <*> many (psep *> px)
 
-sepBy :: Parser a -> Parser b -> Parser [a]
-sepBy px psep = sepBy1 px psep <|> pure []
+sepBy0 :: Parser a -> Parser b -> Parser [a]
+sepBy0 px psep = sepBy1 px psep <|> pure []
 
 lines1 :: Parser a -> Parser [a]
 lines1 px = sepBy1 px newline
@@ -152,11 +192,11 @@ try p = Parser $ \input ->
     Left _ -> Left ""
 
 choice :: [Parser a] -> Parser a
-choice = foldr (<|>) empty
+choice = asum
 
 splitOn :: Char -> Parser a -> Parser (a, a)
 splitOn c px = do
-  xs <- sepBy px (char c)
+  xs <- sepBy0 px (char c)
   case xs of
     [a, b] -> return (a, b)
     _ -> fail $ "Expected exactly two elements seperated by the delimiter:" ++ [c]
@@ -172,6 +212,31 @@ digitsAsList :: Parser [Int]
 digitsAsList =
   map (\c -> fromEnum c - fromEnum '0')
     <$> digits1
+
+-- Bounded Parsers
+i8 :: Parser I8
+i8 = parseBounded
+
+u8 :: Parser U8
+u8 = parseBounded
+
+i16 :: Parser I16
+i16 = parseBounded
+
+u16 :: Parser U16
+u16 = parseBounded
+
+i32 :: Parser I32
+i32 = parseBounded
+
+u32 :: Parser U32
+u32 = parseBounded
+
+i64 :: Parser I64
+i64 = parseBounded
+
+u64 :: Parser U64
+u64 = parseBounded
 
 -- Utilities
 
