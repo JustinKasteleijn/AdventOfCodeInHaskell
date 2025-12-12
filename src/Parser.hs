@@ -26,12 +26,21 @@ module Parser
     splitOn',
     choice,
     unwrapParser,
+    i8,
+    i16,
+    i32,
+    i64,
+    u8,
+    u16,
+    u32,
+    u64,
   )
 where
 
 import Control.Applicative (Alternative (..), asum)
 import Control.Monad (void)
 import Data.Char (isAlpha, isAlphaNum, isDigit)
+import Types.IntegerTypes
 
 type Error = String
 
@@ -166,6 +175,30 @@ parseBounded = do
   if n' >= minBound && n' <= maxBound
     then return n'
     else fail $ "Value out of bounds: " ++ show n
+
+u8 :: Parser U8
+u8 = parseBounded
+
+u16 :: Parser U16
+u16 = parseBounded
+
+u32 :: Parser U32
+u32 = parseBounded
+
+u64 :: Parser U64
+u64 = parseBounded
+
+i8 :: Parser I8
+i8 = parseBounded
+
+i16 :: Parser I16
+i16 = parseBounded
+
+i32 :: Parser I32
+i32 = parseBounded
+
+i64 :: Parser I64
+i64 = parseBounded
 
 sepBy1 :: Parser a -> Parser b -> Parser [a]
 sepBy1 px psep =
