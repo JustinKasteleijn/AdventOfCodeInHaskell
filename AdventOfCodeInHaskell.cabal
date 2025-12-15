@@ -89,7 +89,8 @@ executable AdventOfCodeInHaskell
       MissingH,
       array,
       unordered-containers,
-      mtl
+      mtl,
+      hashable
 
 
     -- Directories containing source files.

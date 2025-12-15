@@ -12,12 +12,14 @@ import Benchmark
 import Control.DeepSeq (NFData)
 import Data.Bits (complement, shiftL, shiftR, (.&.), (.|.))
 import qualified Data.HashMap.Strict as HM
+import Data.Hashable (Hashable)
 import GHC.Generics (Generic)
 import Parser (Parser (..), alpha1, alt, choice, lines1, string, u16, unwrapParser, (<?>))
 import Types.IntegerTypes (U16)
 
 -- -------------- Data types and instances ------------------
-type Wire = String
+newtype Wire = Wire String
+  deriving (Show, Eq, Generic, NFData, Hashable)
 
 type Signals = HM.HashMap Wire U16
 
@@ -46,14 +48,15 @@ parseValue :: Parser ExprValue
 parseValue =
   alt
     ( Lit <$> u16,
-      Ref <$> alpha1
+      Ref . Wire <$> alpha1
     )
 {-# INLINE parseValue #-}
 
 parseTarget :: Parser Wire
 parseTarget =
-  string " -> "
-    *> alpha1
+  Wire
+    <$ string " -> "
+    <*> alpha1
 {-# INLINE parseTarget #-}
 
 parseStatement :: Parser Statement
@@ -188,12 +191,12 @@ evalWire circuit signals wire =
 
 solve1 :: Circuit -> U16
 solve1 circuit =
-  let (res, _) = evalWire circuit HM.empty "a"
+  let (res, _) = evalWire circuit HM.empty (Wire "a")
    in res
 
 solve2 :: Circuit -> U16
 solve2 circuit =
-  let (res, _) = evalWire circuit (HM.fromList [("b", 46065)]) "a"
+  let (res, _) = evalWire circuit (HM.fromList [(Wire "b", 46065)]) (Wire "a")
    in res
 
 run :: IO ()
@@ -234,14 +237,14 @@ circuitInput =
 circuitTest :: Circuit
 circuitTest =
   HM.fromList
-    [ ("x", Assign (Lit 123)),
-      ("y", Assign (Lit 456)),
-      ("d", AND (Ref "x") (Ref "y")),
-      ("e", OR (Ref "x") (Ref "y")),
-      ("f", SHIFTL (Ref "x") 2),
-      ("g", SHIFTR (Ref "y") 2),
-      ("h", NOT (Ref "x")),
-      ("i", NOT (Ref "y"))
+    [ (Wire "x", Assign (Lit 123)),
+      (Wire "y", Assign (Lit 456)),
+      (Wire "d", AND (Ref (Wire "x")) (Ref (Wire "y"))),
+      (Wire "e", OR (Ref (Wire "x")) (Ref (Wire "y"))),
+      (Wire "f", SHIFTL (Ref (Wire "x")) 2),
+      (Wire "g", SHIFTR (Ref (Wire "y")) 2),
+      (Wire "h", NOT (Ref (Wire "x"))),
+      (Wire "i", NOT (Ref (Wire "y")))
     ]
 
 -- ------------ Comments ----------------
