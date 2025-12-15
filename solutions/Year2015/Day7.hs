@@ -10,7 +10,7 @@ where
 import Benchmark
 import Control.DeepSeq (NFData)
 import Data.Bits (complement, shiftL, shiftR, (.&.), (.|.))
-import qualified Data.HashMap.Lazy as HM
+import qualified Data.HashMap.Strict as HM
 import GHC.Generics (Generic)
 import Parser (Parser (..), alpha1, alt, choice, lines1, string, u16, unwrapParser)
 import Types.IntegerTypes (U16)
