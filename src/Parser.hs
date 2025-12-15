@@ -25,6 +25,7 @@ module Parser
     splitOn,
     splitOn',
     choice,
+    alt,
     unwrapParser,
     i8,
     i16,
@@ -220,6 +221,9 @@ try p = Parser $ \input ->
 
 choice :: [Parser a] -> Parser a
 choice = asum
+
+alt :: (Parser a, Parser a) -> Parser a
+alt (px, py) = px <|> py
 
 splitOn :: Char -> Parser a -> Parser (a, a)
 splitOn c px = do
