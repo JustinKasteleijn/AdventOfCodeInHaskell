@@ -90,7 +90,8 @@ executable AdventOfCodeInHaskell
       array,
       unordered-containers,
       mtl,
-      hashable
+      hashable,
+      bytestring
 
 
     -- Directories containing source files.

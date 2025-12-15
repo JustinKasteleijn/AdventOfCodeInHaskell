@@ -44,7 +44,7 @@ data Statement
   deriving (Show, Eq, NFData, Generic)
 
 -- ---------------- Parsing --------------------
-parseValue :: Parser ExprValue
+parseValue :: Parser String ExprValue
 parseValue =
   alt
     ( Lit <$> u16,
@@ -52,14 +52,14 @@ parseValue =
     )
 {-# INLINE parseValue #-}
 
-parseTarget :: Parser Wire
+parseTarget :: Parser String Wire
 parseTarget =
   Wire
     <$ string " -> "
     <*> alpha1
 {-# INLINE parseTarget #-}
 
-parseStatement :: Parser Statement
+parseStatement :: Parser String Statement
 parseStatement =
   choice
     [ parseAnd,
@@ -70,7 +70,7 @@ parseStatement =
       parseAssign
     ]
 
-parseCircuit :: Parser Circuit
+parseCircuit :: Parser String Circuit
 parseCircuit =
   HM.fromList
     . map statementToTuple
@@ -82,7 +82,7 @@ parseCircuit =
 parseBinGate ::
   String ->
   (ExprValue -> ExprValue -> Expr) ->
-  Parser Statement
+  Parser String Statement
 parseBinGate str constructor = do
   v1 <- parseValue
   _ <- string str
@@ -91,20 +91,20 @@ parseBinGate str constructor = do
   return $ Statement target (constructor v1 v2)
 {-# INLINE parseBinGate #-}
 
-parseAnd :: Parser Statement
+parseAnd :: Parser String Statement
 parseAnd = parseBinGate " AND " AND
 
-parseOr :: Parser Statement
+parseOr :: Parser String Statement
 parseOr = parseBinGate " OR " OR
 
-parseWire :: Parser ExprValue
+parseWire :: Parser String ExprValue
 parseWire =
   parseValue >>= \case
     r@(Ref _) -> return r
     Lit _ -> fail "Failed to parse wire"
 {-# INLINE parseWire #-}
 
-parseLit :: Parser U16
+parseLit :: Parser String U16
 parseLit =
   parseValue >>= \case
     Lit n -> return n
@@ -114,7 +114,7 @@ parseLit =
 parseShift ::
   String ->
   (ExprValue -> U16 -> Expr) ->
-  Parser Statement
+  Parser String Statement
 parseShift str constructor = do
   wire <- parseWire <?> ("Expected a wire as first argument to:" ++ str)
   _ <- string str
@@ -123,13 +123,13 @@ parseShift str constructor = do
   return $ Statement target (constructor wire lit)
 {-# INLINE parseShift #-}
 
-parseShiftR :: Parser Statement
+parseShiftR :: Parser String Statement
 parseShiftR = parseShift " RSHIFT " SHIFTR
 
-parseShiftL :: Parser Statement
+parseShiftL :: Parser String Statement
 parseShiftL = parseShift " LSHIFT " SHIFTL
 
-parseNot :: Parser Statement
+parseNot :: Parser String Statement
 parseNot = do
   _ <- string "NOT "
   wire <- parseWire <?> "Expected a wire as the argument of NOT (complement)"
@@ -137,7 +137,7 @@ parseNot = do
   return $ Statement target (NOT wire)
 {-# INLINE parseNot #-}
 
-parseAssign :: Parser Statement
+parseAssign :: Parser String Statement
 parseAssign = do
   val <- parseValue
   target <- parseTarget
@@ -231,7 +231,7 @@ circuitInput =
       "a LSHIFT 1 -> e",
       "b RSHIFT 1 -> f",
       "NOT a -> g",
-      "NOT b -> h"
+      "NOT 12 -> h"
     ]
 
 circuitTest :: Circuit
@@ -246,6 +246,13 @@ circuitTest =
       (Wire "g", NOT (Ref (Wire "a"))),
       (Wire "h", NOT (Ref (Wire "b")))
     ]
+
+parseAll :: Parser String a -> String -> Either String a
+parseAll p input =
+  case parse p input of
+    Right (x, "") -> Right x
+    Right (_, rest) -> Left $ "Unconsumed input: " ++ show rest
+    Left err -> Left err
 
 -- ------------ Comments ----------------
 --

@@ -44,7 +44,7 @@ data Instruction
   }
   deriving (Show, Generic, NFData)
 
-parseModifier :: Parser Modify
+parseModifier :: Parser String Modify
 parseModifier =
   choice
     [ string "toggle " $> Toggle,
@@ -52,17 +52,17 @@ parseModifier =
       string "turn off " $> Off
     ]
 
-parseCoords :: Parser (V2 Int)
+parseCoords :: Parser String (V2 Int)
 parseCoords = fmap (uncurry V2) (splitOn ',' int)
 
-parseInstruction :: Parser Instruction
+parseInstruction :: Parser String Instruction
 parseInstruction = do
   modifier' <- parseModifier
   from' <- parseCoords
   _ <- string " through "
   Instruction modifier' from' <$> parseCoords
 
-parseInstructions :: Parser [Instruction]
+parseInstructions :: Parser String [Instruction]
 parseInstructions = lines1 parseInstruction
 
 executeInstruction ::

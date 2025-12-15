@@ -9,7 +9,7 @@ import Parser
 
 type Rule = String -> Bool
 
-parseWords :: Parser [String]
+parseWords :: Parser String [String]
 parseWords = lines1 alpha1
 
 threeVowels :: Rule

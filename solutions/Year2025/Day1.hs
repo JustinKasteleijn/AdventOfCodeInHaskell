@@ -24,14 +24,14 @@ data Rotation
   | R Int
   deriving (Show, Generic, NFData)
 
-parseRotation :: Parser Rotation
+parseRotation :: Parser String Rotation
 parseRotation =
   choice
     [ L <$> (char 'L' *> int),
       R <$> (char 'R' *> int)
     ]
 
-parseRotations :: Parser [Rotation]
+parseRotations :: Parser String [Rotation]
 parseRotations = lines1 parseRotation
 
 newtype Dial = Dial Int

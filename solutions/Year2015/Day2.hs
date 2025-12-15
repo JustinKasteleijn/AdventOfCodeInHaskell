@@ -22,12 +22,12 @@ data RectangularCuboid = RC
 mkRectangularCuboid :: Int -> Int -> Int -> RectangularCuboid
 mkRectangularCuboid = RC
 
-parseRectangularCuboid :: Parser RectangularCuboid
+parseRectangularCuboid :: Parser String RectangularCuboid
 parseRectangularCuboid = do
   [x, y, z] <- sepBy1 int (char 'x')
   return $ mkRectangularCuboid x y z
 
-parseRectangularCuboids :: Parser [RectangularCuboid]
+parseRectangularCuboids :: Parser String [RectangularCuboid]
 parseRectangularCuboids = lines1 parseRectangularCuboid
 
 area :: RectangularCuboid -> Int
