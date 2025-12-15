@@ -78,7 +78,6 @@ parseCircuit =
   where
     statementToTuple :: Statement -> (Wire, Expr)
     statementToTuple (Statement wire expr) = (wire, expr)
-    {-# INLINE statementToTuple #-}
 
 parseBinGate ::
   String ->
