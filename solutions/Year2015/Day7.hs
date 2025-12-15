@@ -225,27 +225,27 @@ testParsingExample = unwrapParser parseCircuit circuitInput == circuitTest
 circuitInput :: String
 circuitInput =
   unlines
-    [ "123 -> x",
-      "456 -> y",
-      "x AND y -> d",
-      "x OR y -> e",
-      "x LSHIFT 2 -> f",
-      "y RSHIFT 2 -> g",
-      "NOT x -> h",
-      "NOT y -> i"
+    [ "1 -> a",
+      "2 -> b",
+      "a AND b -> c",
+      "a OR b -> d",
+      "a LSHIFT 1 -> e",
+      "b RSHIFT 1 -> f",
+      "NOT a -> g",
+      "NOT b -> h"
     ]
 
 circuitTest :: Circuit
 circuitTest =
   HM.fromList
-    [ (Wire "x", Assign (Lit 123)),
-      (Wire "y", Assign (Lit 456)),
-      (Wire "d", AND (Ref (Wire "x")) (Ref (Wire "y"))),
-      (Wire "e", OR (Ref (Wire "x")) (Ref (Wire "y"))),
-      (Wire "f", SHIFTL (Ref (Wire "x")) 2),
-      (Wire "g", SHIFTR (Ref (Wire "y")) 2),
-      (Wire "h", NOT (Ref (Wire "x"))),
-      (Wire "i", NOT (Ref (Wire "y")))
+    [ (Wire "a", Assign (Lit 1)),
+      (Wire "b", Assign (Lit 2)),
+      (Wire "c", AND (Ref (Wire "a")) (Ref (Wire "b"))),
+      (Wire "d", OR (Ref (Wire "a")) (Ref (Wire "b"))),
+      (Wire "e", SHIFTL (Ref (Wire "a")) 1),
+      (Wire "f", SHIFTR (Ref (Wire "b")) 1),
+      (Wire "g", NOT (Ref (Wire "a"))),
+      (Wire "h", NOT (Ref (Wire "b")))
     ]
 
 -- ------------ Comments ----------------
