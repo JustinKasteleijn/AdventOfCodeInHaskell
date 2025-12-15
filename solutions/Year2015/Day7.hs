@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE LambdaCase #-}
 
 module Year2015.Day7
   ( run,
@@ -10,17 +11,16 @@ import Benchmark
 import Control.Applicative (Alternative (..))
 import Control.DeepSeq (NFData (..))
 import Data.Bits (Bits (complement, shiftR), complement, shiftL, shiftR, (.&.), (.|.))
-import qualified Data.HashMap.Internal.Array as Map
 import qualified Data.HashMap.Lazy as HM
-import Data.Maybe (fromJust)
 import GHC.Generics (Generic)
 import Parser (Parser (..), alpha1, choice, int, lines1, spaces0, string, u16, unwrapParser)
 import Types.IntegerTypes
-import Prelude hiding (map)
 
 type Wire = String
 
 type Signals = HM.HashMap Wire U16
+
+type Circuit = HM.HashMap Wire Expr
 
 data Value
   = Lit {-# UNPACK #-} !U16
@@ -48,8 +48,11 @@ parseValue =
       Ref <$> alpha1
     ]
 
-parseStatements :: Parser [Statement]
-parseStatements = lines1 parseStatement
+parseStatements :: Parser Circuit
+parseStatements =
+  HM.fromList
+    . map (\(Statement w expr) -> (w, expr))
+    <$> lines1 parseStatement
 
 parseStatement :: Parser Statement
 parseStatement =
@@ -100,13 +103,57 @@ parseNot = do
 
 parseAssign :: Parser Statement
 parseAssign = do
-  digits <- u16
+  val <- parseValue
   _ <- string " -> "
   var <- alpha1
-  return $ Statement var (VAL $ Lit digits)
+  return $ Statement var (VAL val)
 
-solve1 :: [Statement] -> U16
-solve1 stmts = undefined
+evalWire :: Circuit -> Signals -> Wire -> (U16, Signals)
+evalWire circuit signals target =
+  case HM.lookup target signals of
+    Just v -> (v, signals)
+    Nothing ->
+      case HM.lookup target circuit of
+        Nothing -> error $ "Wire not found in circuit: " ++ show target
+        Just expr ->
+          let (v', signals') = evalExpr circuit signals expr
+           in (v', HM.insert target v' signals')
+
+evalExpr :: Circuit -> Signals -> Expr -> (U16, Signals)
+evalExpr circuit signals = \case
+  VAL v -> evalValue circuit signals v
+  AND a b ->
+    let (a', signals') = evalValue circuit signals a
+        (b', signals'') = evalValue circuit signals' b
+     in (a' .&. b', signals'')
+  OR a b ->
+    let (a', signals') = evalValue circuit signals a
+        (b', signals'') = evalValue circuit signals' b
+     in (a' .|. b', signals'')
+  SHIFTL n a ->
+    let (a', signals') = evalValue circuit signals a
+     in (a' `shiftL` n, signals')
+  SHIFTR n a ->
+    let (a', signals') = evalValue circuit signals a
+     in (a' `shiftR` n, signals')
+  NOT a ->
+    let (a', signals') = evalValue circuit signals a
+     in (complement a', signals')
+
+evalValue :: Circuit -> Signals -> Value -> (U16, Signals)
+evalValue circuit signals = \case
+  Lit x -> (x, signals)
+  Ref wire -> evalWire circuit signals wire
+
+solve1 :: Circuit -> U16
+solve1 circuit =
+  let (result, _) = evalWire circuit HM.empty "a"
+   in result
+
+solve2 :: Circuit -> U16
+solve2 circuit =
+  let (result, _) = evalWire circuit (HM.fromList [("b", 46065)]) "a"
+   in result
 
 run :: IO ()
 run = do
@@ -125,6 +172,11 @@ run = do
 
   res1 <- timeIt "Part 1" $ solve1 parsed
   print res1
+
+  putChar '\n'
+
+  res2 <- timeIt "Part 2" $ solve2 parsed
+  print res2
 
 testParseAnd :: Bool
 testParseAnd =
