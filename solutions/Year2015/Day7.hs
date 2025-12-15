@@ -194,9 +194,9 @@ solve1 circuit =
   let (res, _) = evalWire circuit HM.empty (Wire "a")
    in res
 
-solve2 :: Circuit -> U16
-solve2 circuit =
-  let (res, _) = evalWire circuit (HM.fromList [(Wire "b", 46065)]) (Wire "a")
+solve2 :: Circuit -> U16 -> U16
+solve2 circuit prev =
+  let (res, _) = evalWire circuit (HM.fromList [(Wire "b", prev)]) (Wire "a")
    in res
 
 run :: IO ()
@@ -215,7 +215,7 @@ run = do
 
   putChar '\n'
 
-  res2 <- timeIt "Part 2" (solve2 parsed)
+  res2 <- timeIt "Part 2" (solve2 parsed res1)
   print res2
 
 testParsingExample :: Bool
