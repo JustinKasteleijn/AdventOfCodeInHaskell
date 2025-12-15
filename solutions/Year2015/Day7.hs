@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE LambdaCase #-}
@@ -47,11 +48,13 @@ parseValue =
     ( Lit <$> u16,
       Ref <$> alpha1
     )
+{-# INLINE parseValue #-}
 
 parseTarget :: Parser Wire
 parseTarget =
   string " -> "
     *> alpha1
+{-# INLINE parseTarget #-}
 
 parseStatement :: Parser Statement
 parseStatement =
@@ -144,22 +147,27 @@ evalExpr :: Circuit -> Signals -> Expr -> (U16, Signals)
 evalExpr circuit signals = \case
   Assign v -> evalValue circuit signals v
   AND a b ->
-    let (a', signals') = evalValue circuit signals a
-        (b', signals'') = evalValue circuit signals' b
-     in (a' .&. b', signals'')
+    let !(a', signals') = evalValue circuit signals a
+        !(b', signals'') = evalValue circuit signals' b
+        !res = a' .&. b'
+     in (res, signals'')
   OR a b ->
-    let (a', signals') = evalValue circuit signals a
-        (b', signals'') = evalValue circuit signals' b
-     in (a' .|. b', signals'')
+    let !(a', signals') = evalValue circuit signals a
+        !(b', signals'') = evalValue circuit signals' b
+        !res = (a' .|. b')
+     in (res, signals'')
   SHIFTL a n ->
-    let (a', signals') = evalValue circuit signals a
-     in (a' `shiftL` fromIntegral n, signals')
+    let !(a', signals') = evalValue circuit signals a
+        !res = a' `shiftL` fromIntegral n
+     in (res, signals')
   SHIFTR a n ->
-    let (a', signals') = evalValue circuit signals a
-     in (a' `shiftR` fromIntegral n, signals')
+    let !(a', signals') = evalValue circuit signals a
+        !res = a' `shiftR` fromIntegral n
+     in (res, signals')
   NOT a ->
-    let (a', signals') = evalValue circuit signals a
-     in (complement a', signals')
+    let !(a', signals') = evalValue circuit signals a
+        !res = complement a'
+     in (res, signals')
 
 evalValue :: Circuit -> Signals -> ExprValue -> (U16, Signals)
 evalValue circuit signals = \case
@@ -172,9 +180,10 @@ evalWire circuit signals wire =
   case HM.lookup wire signals of
     Just n -> (n, signals)
     Nothing ->
-      let expr = circuit HM.! wire
-          (n, signals') = evalExpr circuit signals expr
-       in (n, HM.insert wire n signals')
+      let !expr = circuit HM.! wire
+          !(n, signals') = evalExpr circuit signals expr
+          memo = HM.insert wire n signals'
+       in (n, memo)
 {-# INLINE evalWire #-}
 
 solve1 :: Circuit -> U16
