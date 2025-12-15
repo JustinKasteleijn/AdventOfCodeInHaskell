@@ -13,7 +13,7 @@ import Control.DeepSeq (NFData)
 import Data.Bits (complement, shiftL, shiftR, (.&.), (.|.))
 import qualified Data.HashMap.Strict as HM
 import GHC.Generics (Generic)
-import Parser (Parser (..), alpha1, alt, choice, lines1, string, u16, unwrapParser)
+import Parser (Parser (..), alpha1, alt, choice, lines1, string, u16, unwrapParser, (<?>))
 import Types.IntegerTypes (U16)
 
 -- -------------- Data types and instances ------------------
@@ -94,18 +94,18 @@ parseAnd = parseBinGate " AND " AND
 parseOr :: Parser Statement
 parseOr = parseBinGate " OR " OR
 
-parseWire :: String -> Parser ExprValue
-parseWire errMsg =
+parseWire :: Parser ExprValue
+parseWire =
   parseValue >>= \case
     r@(Ref _) -> return r
-    Lit _ -> fail errMsg
+    Lit _ -> fail "Failed to parse wire"
 {-# INLINE parseWire #-}
 
 parseLit :: Parser U16
 parseLit =
   parseValue >>= \case
     Lit n -> return n
-    Ref _ -> fail "Expected literal as second argument of shift"
+    Ref _ -> fail "Failed to parse literal"
 {-# INLINE parseLit #-}
 
 parseShift ::
@@ -113,9 +113,9 @@ parseShift ::
   (ExprValue -> U16 -> Expr) ->
   Parser Statement
 parseShift str constructor = do
-  wire <- parseWire "Expected a wire as first argument to shift"
+  wire <- parseWire <?> ("Expected a wire as first argument to:" ++ str)
   _ <- string str
-  lit <- parseLit
+  lit <- parseLit <?> ("Expected a wire as the second argument to:" ++ str)
   target <- parseTarget
   return $ Statement target (constructor wire lit)
 {-# INLINE parseShift #-}
@@ -129,7 +129,7 @@ parseShiftL = parseShift " LSHIFT " SHIFTL
 parseNot :: Parser Statement
 parseNot = do
   _ <- string "NOT "
-  wire <- parseWire "Expected a wire as the argument of not"
+  wire <- parseWire <?> "Expected a wire as the argument of NOT (complement)"
   target <- parseTarget
   return $ Statement target (NOT wire)
 {-# INLINE parseNot #-}
@@ -199,6 +199,8 @@ solve2 circuit =
 run :: IO ()
 run = do
   print $ "Test parsing on example input: " ++ show testParsingExample
+
+  putChar '\n'
 
   input <- readFile "solutions/Year2015/inputs/day7.txt"
   parsed <- timeIt "Parsing" (unwrapParser parseCircuit input)

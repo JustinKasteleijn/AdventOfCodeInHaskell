@@ -35,6 +35,7 @@ module Parser
     u16,
     u32,
     u64,
+    (<?>),
   )
 where
 
@@ -238,6 +239,15 @@ splitOn' str px py = do
   _ <- string str
   y <- py
   return (x, y)
+
+label :: String -> Parser a -> Parser a
+label errMsg px = Parser $ \input ->
+  case parse px input of
+    Right x -> Right x
+    Left _ -> Left errMsg
+
+(<?>) :: Parser a -> String -> Parser a
+px <?> ctx = label ctx px
 
 -- Utilities
 
