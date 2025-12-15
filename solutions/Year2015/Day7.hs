@@ -247,13 +247,6 @@ circuitTest =
       (Wire "h", NOT (Ref (Wire "b")))
     ]
 
-parseAll :: Parser String a -> String -> Either String a
-parseAll p input =
-  case parse p input of
-    Right (x, "") -> Right x
-    Right (_, rest) -> Left $ "Unconsumed input: " ++ show rest
-    Left err -> Left err
-
 -- ------------ Comments ----------------
 --
 -- Applicative ParseAnd
