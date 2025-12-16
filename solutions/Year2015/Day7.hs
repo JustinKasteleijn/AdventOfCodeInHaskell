@@ -147,30 +147,30 @@ parseAssign = do
 -- -------------- Evaluators ---------------
 
 evalExpr :: Circuit -> Signals -> Expr -> (U16, Signals)
-evalExpr circuit signals = \case
+evalExpr circuit signals expr = case expr of
   Assign v -> evalValue circuit signals v
-  AND a b ->
-    let !(a', signals') = evalValue circuit signals a
-        !(b', signals'') = evalValue circuit signals' b
-        !res = a' .&. b'
-     in (res, signals'')
-  OR a b ->
-    let !(a', signals') = evalValue circuit signals a
-        !(b', signals'') = evalValue circuit signals' b
-        !res = (a' .|. b')
-     in (res, signals'')
-  SHIFTL a n ->
-    let !(a', signals') = evalValue circuit signals a
-        !res = a' `shiftL` fromIntegral n
-     in (res, signals')
-  SHIFTR a n ->
-    let !(a', signals') = evalValue circuit signals a
-        !res = a' `shiftR` fromIntegral n
-     in (res, signals')
-  NOT a ->
-    let !(a', signals') = evalValue circuit signals a
-        !res = complement a'
-     in (res, signals')
+  AND a b -> binOp (.&.) a b
+  OR a b -> binOp (.|.) a b
+  SHIFTL a n -> shiftOp (`shiftL` fromIntegral n) a
+  SHIFTR a n -> shiftOp (`shiftR` fromIntegral n) a
+  NOT a -> unaryOp complement a
+  where
+    binOp :: (U16 -> U16 -> U16) -> ExprValue -> ExprValue -> (U16, Signals)
+    binOp op x y =
+      let (x', s1) = evalValue circuit signals x
+          (y', s2) = evalValue circuit s1 y
+          res = x' `op` y'
+       in (res, s2)
+
+    shiftOp :: (U16 -> U16) -> ExprValue -> (U16, Signals)
+    shiftOp op x =
+      let (x', s) = evalValue circuit signals x
+       in (op x', s)
+
+    unaryOp :: (U16 -> U16) -> ExprValue -> (U16, Signals)
+    unaryOp op x =
+      let (x', s) = evalValue circuit signals x
+       in (op x', s)
 
 evalValue :: Circuit -> Signals -> ExprValue -> (U16, Signals)
 evalValue circuit signals = \case
