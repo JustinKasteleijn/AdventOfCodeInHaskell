@@ -75,6 +75,7 @@ executable AdventOfCodeInHaskell
       Year2015.Day5,
       Year2015.Day6,
       Year2015.Day7,
+      Year2015.Day8,
       Year2025.Day1
 
     -- LANGUAGE extensions used by modules in this package.

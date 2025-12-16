@@ -21,6 +21,7 @@ module Parser
     alphaNum1,
     newline0,
     newline1,
+    parseLine,
     sepBy0,
     sepBy1,
     lines1,
@@ -174,6 +175,13 @@ class IsAlphaNum t where
 instance IsAlphaNum Char where
   isAlphaNumToken :: Char -> Bool
   isAlphaNumToken = isAlphaNum
+
+instance IsAlphaNum U8 where
+  isAlphaNumToken :: U8 -> Bool
+  isAlphaNumToken w =
+    (w >= 48 && w <= 57) -- '0'..'9'
+      || (w >= 65 && w <= 90) -- 'A'..'Z'
+      || (w >= 97 && w <= 122) -- 'a'..'z'
 
 class Digit t where
   digitToInt :: t -> Int
@@ -411,6 +419,9 @@ splitOn' str px py = do
   _ <- string str
   y <- py
   return (x, y)
+
+parseLine :: (Textual s, IsNewline (Elem s), Show (Elem s)) => Parser s [Elem s]
+parseLine = many (satisfy (not . isNewlineToken))
 
 label :: (Textual s) => ParserError -> Parser s a -> Parser s a
 label errMsg px = Parser $ \input ->
