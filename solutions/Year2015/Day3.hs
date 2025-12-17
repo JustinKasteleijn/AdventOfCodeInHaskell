@@ -3,13 +3,13 @@ module Year2015.Day3
   )
 where
 
-import Benchmark
-import Data.List (foldl')
-import qualified Data.Set as S
-import Linear.V2 (V2 (..), origin)
+import           Benchmark
+import           Data.List (foldl')
+import qualified Data.Set  as S
+import           Linear.V2 (V2 (..), origin)
 
 data FoldState = FS
-  { visited :: !(S.Set (V2 Int)),
+  { visited     :: !(S.Set (V2 Int)),
     _currentPos :: !(V2 Int)
   }
 
@@ -20,7 +20,7 @@ deliver (FS acc (V2 x y)) c =
         'v' -> (0, -1)
         '>' -> (1, 0)
         '<' -> (-1, 0)
-        _ -> (0, 0)
+        _   -> (0, 0)
       pos = V2 (x + dx) (y + dy)
    in FS (S.insert pos acc) pos
 

@@ -1,21 +1,22 @@
-{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE BangPatterns   #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE DeriveGeneric  #-}
+{-# LANGUAGE LambdaCase     #-}
 
 module Year2015.Day7
   ( run,
   )
 where
 
-import Benchmark
-import Control.DeepSeq (NFData)
-import Data.Bits (complement, shiftL, shiftR, (.&.), (.|.))
+import           Benchmark
+import           Control.DeepSeq     (NFData)
+import           Data.Bits           (complement, shiftL, shiftR, (.&.), (.|.))
+import           Data.Hashable       (Hashable)
 import qualified Data.HashMap.Strict as HM
-import Data.Hashable (Hashable)
-import GHC.Generics (Generic)
-import Parser (Parser (..), alpha1, alt, choice, lines1, string, u16, unwrapParser, (<?>))
-import Types.IntegerTypes (U16)
+import           GHC.Generics        (Generic)
+import           Parser              (Parser (..), alpha1, alt, choice, lines1,
+                                      string, u16, unwrapParser, (<?>))
+import           Types.IntegerTypes  (U16)
 
 -- -------------- Data types and instances ------------------
 newtype Wire = Wire String
@@ -148,12 +149,12 @@ parseAssign = do
 
 evalExpr :: Circuit -> Signals -> Expr -> (U16, Signals)
 evalExpr circuit signals expr = case expr of
-  Assign v -> evalValue circuit signals v
-  AND a b -> binOp (.&.) a b
-  OR a b -> binOp (.|.) a b
+  Assign v   -> evalValue circuit signals v
+  AND a b    -> binOp (.&.) a b
+  OR a b     -> binOp (.|.) a b
   SHIFTL a n -> shiftOp (`shiftL` fromIntegral n) a
   SHIFTR a n -> shiftOp (`shiftR` fromIntegral n) a
-  NOT a -> unaryOp complement a
+  NOT a      -> unaryOp complement a
   where
     binOp :: (U16 -> U16 -> U16) -> ExprValue -> ExprValue -> (U16, Signals)
     binOp op x y =

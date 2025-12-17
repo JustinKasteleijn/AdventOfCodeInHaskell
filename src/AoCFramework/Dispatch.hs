@@ -3,17 +3,17 @@ module AoCFramework.Dispatch
   )
 where
 
-import AoCFramework.AoCTypes
-import qualified Data.Map as Map
-import Year2015.Day1 as Y2015D1
-import Year2015.Day2 as Y2015D2
-import Year2015.Day3 as Y2015D3
-import Year2015.Day4 as Y2015D4
-import Year2015.Day5 as Y2015D5
-import Year2015.Day6 as Y2015D6
-import Year2015.Day7 as Y2015D7
-import Year2015.Day8 as Y2015D8
-import Year2025.Day1 as Y2025D1
+import           AoCFramework.AoCTypes
+import qualified Data.Map              as Map
+import           Year2015.Day1         as Y2015D1
+import           Year2015.Day2         as Y2015D2
+import           Year2015.Day3         as Y2015D3
+import           Year2015.Day4         as Y2015D4
+import           Year2015.Day5         as Y2015D5
+import           Year2015.Day6         as Y2015D6
+import           Year2015.Day7         as Y2015D7
+import           Year2015.Day8         as Y2015D8
+import           Year2025.Day1         as Y2025D1
 
 type SolutionMap = Map.Map (Year, Day) (IO ())
 

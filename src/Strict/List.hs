@@ -4,7 +4,7 @@ module Strict.List
   )
 where
 
-import Data.List (foldl')
+import           Data.List (foldl')
 
 sum' :: (Num a) => [a] -> a
 sum' = foldl' (+) 0

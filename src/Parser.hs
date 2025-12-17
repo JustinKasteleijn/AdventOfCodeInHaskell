@@ -1,8 +1,8 @@
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE InstanceSigs        #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeFamilies        #-}
 
 module Parser
   ( Parser (..),
@@ -42,13 +42,14 @@ module Parser
   )
 where
 
-import Control.Applicative (Alternative (..), asum)
-import Control.Monad (void)
-import qualified Data.ByteString as BS
-import Data.Char (isAlpha, isAlphaNum, isDigit, isSpace, ord)
-import Data.Data (Proxy (..))
-import Data.List (foldl')
-import Types.IntegerTypes
+import           Control.Applicative (Alternative (..), asum)
+import           Control.Monad       (void)
+import qualified Data.ByteString     as BS
+import           Data.Char           (isAlpha, isAlphaNum, isDigit, isSpace,
+                                      ord)
+import           Data.Data           (Proxy (..))
+import           Data.List           (foldl')
+import           Types.IntegerTypes
 
 type ParserError = String
 
@@ -98,7 +99,7 @@ instance Alternative (Parser s) where
     \input -> case parse px input of
       Right t -> Right t
       Left msg -> case parse py input of
-        Right t' -> Right t'
+        Right t'  -> Right t'
         Left msg' -> Left $ msg ++ " or " ++ msg'
 
 --- Supported types
@@ -111,7 +112,7 @@ instance Textual [a] where
   type Elem [a] = a
 
   uncons :: [a] -> Maybe (a, [a])
-  uncons [] = Nothing
+  uncons []       = Nothing
   uncons (x : xs) = Just (x, xs)
 
 instance Textual BS.ByteString where
@@ -208,7 +209,7 @@ instance MinusSign BS.ByteString where
 item :: (Textual s) => Parser s (Elem s)
 item = Parser $ \input ->
   case uncons input of
-    Nothing -> Left "Unexpected end of input"
+    Nothing      -> Left "Unexpected end of input"
     Just (x, xs) -> Right (x, xs)
 
 char :: (Textual s, Eq (Elem s), Show (Elem s)) => Elem s -> Parser s (Elem s)
@@ -427,7 +428,7 @@ label :: (Textual s) => ParserError -> Parser s a -> Parser s a
 label errMsg px = Parser $ \input ->
   case parse px input of
     Right t -> Right t
-    Left _ -> Left errMsg
+    Left _  -> Left errMsg
 
 (<?>) :: (Textual s) => Parser s a -> String -> Parser s a
 px <?> ctx = label ctx px
@@ -438,4 +439,4 @@ unwrapParser :: Parser s a -> s -> a
 unwrapParser p input =
   case parse p input of
     Right (x, _) -> x
-    Left err -> error $ "Parse failed: " ++ err
+    Left err     -> error $ "Parse failed: " ++ err

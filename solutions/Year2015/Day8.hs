@@ -3,10 +3,10 @@ module Year2015.Day8
   )
 where
 
-import Benchmark (timeIt)
-import qualified Data.ByteString as BS
-import Parser
-import Types.IntegerTypes (U8)
+import           Benchmark          (timeIt)
+import qualified Data.ByteString    as BS
+import           Parser
+import           Types.IntegerTypes (U8)
 
 -- ----------- Parse ------------
 parseWords :: Parser BS.ByteString [BS.ByteString]

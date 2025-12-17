@@ -1,5 +1,5 @@
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass   #-}
+{-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE FlexibleContexts #-}
 
 module Year2015.Day6
@@ -7,18 +7,19 @@ module Year2015.Day6
   )
 where
 
-import Benchmark
-import Control.DeepSeq (NFData (..), force)
-import Control.Monad (forM_)
-import Control.Monad.ST
-import Data.Array.Base (MArray (unsafeRead, unsafeWrite))
-import Data.Array.ST
-import Data.Functor (($>))
-import Data.List (foldl')
-import GHC.Generics (Generic (..))
-import Linear.V2 (V2 (..))
-import Parser (Parser (..), choice, int, lines1, splitOn, string, unwrapParser)
-import Strict.List (product')
+import           Benchmark
+import           Control.DeepSeq  (NFData (..), force)
+import           Control.Monad    (forM_)
+import           Control.Monad.ST
+import           Data.Array.Base  (MArray (unsafeRead, unsafeWrite))
+import           Data.Array.ST
+import           Data.Functor     (($>))
+import           Data.List        (foldl')
+import           GHC.Generics     (Generic (..))
+import           Linear.V2        (V2 (..))
+import           Parser           (Parser (..), choice, int, lines1, splitOn,
+                                   string, unwrapParser)
+import           Strict.List      (product')
 
 data Modify
   = Toggle
@@ -39,8 +40,8 @@ flattenV2 width (V2 x y) = y * width + x
 data Instruction
   = Instruction
   { modifier :: {-# UNPACK #-} !Modify,
-    from :: {-# UNPACK #-} !(V2 Int),
-    to :: {-# UNPACK #-} !(V2 Int)
+    from     :: {-# UNPACK #-} !(V2 Int),
+    to       :: {-# UNPACK #-} !(V2 Int)
   }
   deriving (Show, Generic, NFData)
 
@@ -80,14 +81,14 @@ executeInstruction act arr (Instruction modifier' (V2 x1 y1) (V2 x2 y2)) =
           unsafeWrite arr idx (f old)
 
 actBool :: Modify -> Bool -> Bool
-actBool On _ = True
-actBool Off _ = False
+actBool On _     = True
+actBool Off _    = False
 actBool Toggle b = not b
 {-# INLINE actBool #-}
 
 actInt :: Modify -> Int -> Int
-actInt On n = n + 1
-actInt Off n = max 0 (n - 1)
+actInt On n     = n + 1
+actInt Off n    = max 0 (n - 1)
 actInt Toggle n = n + 2
 {-# INLINE actInt #-}
 
@@ -101,7 +102,7 @@ solve1 instructions = do
   return $ foldl' countTrues 0 elems
   where
     countTrues :: Int -> Bool -> Int
-    countTrues acc True = acc + 1
+    countTrues acc True  = acc + 1
     countTrues acc False = acc
     {-# INLINE countTrues #-}
 

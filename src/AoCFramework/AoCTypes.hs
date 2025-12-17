@@ -1,6 +1,6 @@
 module AoCFramework.AoCTypes where
 
-import Text.Read (readMaybe)
+import           Text.Read (readMaybe)
 
 newtype Day = Day Int
   deriving (Show, Eq, Ord, Read)

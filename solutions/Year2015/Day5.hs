@@ -3,9 +3,9 @@ module Year2015.Day5
   )
 where
 
-import Benchmark
-import Data.List (group, isInfixOf, tails)
-import Parser
+import           Benchmark
+import           Data.List (group, isInfixOf, tails)
+import           Parser
 
 type Rule = String -> Bool
 

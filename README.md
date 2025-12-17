@@ -1,4 +1,4 @@
-# Advent of Code in Haskell ⭐ (16/524) ⭐  
+# Advent of Code in Haskell ⭐ (18/524) ⭐  
 
 This project will contain all of my solutions for Advent of Code (AoC).
 
@@ -7,7 +7,7 @@ This project will contain all of my solutions for Advent of Code (AoC).
 ### 2015 Progress
 
 Day 1-5:   ⭐⭐ ⭐⭐ ⭐⭐ ⭐⭐ ⭐⭐  
-Day 6-10:  ⭐⭐ ⭐⭐  ✩✩ ✩✩ ✩✩  
+Day 6-10:  ⭐⭐ ⭐⭐ ⭐⭐ ✩✩ ✩✩  
 Day 11-15: ✩✩ ✩✩ ✩✩ ✩✩ ✩✩  
 Day 16-20: ✩✩ ✩✩ ✩✩ ✩✩ ✩✩  
 Day 21-25: ✩✩ ✩✩ ✩✩ ✩✩ ✩✩

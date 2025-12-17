@@ -3,8 +3,8 @@ module Year2015.Day4
   )
 where
 
-import Benchmark
-import Data.Hash.MD5 (Str (..), md5s)
+import           Benchmark
+import           Data.Hash.MD5 (Str (..), md5s)
 
 solve :: String -> Int -> Int -> Int
 solve base suffix n
